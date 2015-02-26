@@ -5,7 +5,6 @@ from nltk import FreqDist
 from nltk.corpus import stopwords
 from operator import itemgetter
 import tempfile 
-import pprint
 
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask.ext.uploads import UploadSet, configure_uploads, TEXT
@@ -38,11 +37,12 @@ def index():
 			#TODO: handle extension error (flaskext.uploads.UploadNotAllowed exception)
 			filename = docs.save(file_to_upload)
 			filepath = os.path.join(TEMP_DIR,filename)
-			logger.debug("Saved file to %s" % filepath)
+			logger.debug("Reading words from file (%s)" % filepath)
 			bag_of_words = ""
 			with open(filepath, "r") as myfile:
 				bag_of_words = myfile.read()
 		else:
+			logger.debug("Reading words from textarea")
 			bag_of_words = request.form['bagOfWords']
 
 		if "removeStopWords" in request.form:
