@@ -17,8 +17,8 @@ logger = logging.getLogger(__name__)
 @app.route("/",methods=['GET', 'POST'])
 def index():
 	word_counts = None
-	bigrams = None
-	trigrams = None
+	bigram_counts = None
+	trigram_counts = None
 
     #this means the form was submitted
 	if request.method == 'POST':	
@@ -33,12 +33,17 @@ def index():
 		else:
 			ignore_case = False
 
-		words = createWords(bag_of_words, remove_stop_words, ignore_case)
-		word_counts = countWords(words).items()
-		word_counts = sorted(word_counts, key=itemgetter(1), reverse=True)
+		words = createWords(bag_of_words, False, ignore_case)
 
-		bigram_counts = countBigrams(words)
-		trigram_counts = countTrigrams(words)
+		words_perhaps_with_stop_words = createWords(bag_of_words, remove_stop_words, ignore_case)
+
+		word_counts = sortCountList(countWords(words_perhaps_with_stop_words))
+
+		bigram_counts = sortCountList(countBigrams(words))
+		print bigram_counts
+
+		trigram_counts = sortCountList(countTrigrams(words))
+		print trigram_counts
 
 		print word_counts
 
@@ -58,13 +63,19 @@ def createWords(text, remove_stop_words, ignore_case):
 def countWords(words):
 	
 	fdist = FreqDist(words)
-	#print fdist.most_common(100)
 	return fdist
 
 def countBigrams(words):
-	
+	bigrams = nltk.bigrams(words)
+	return nltk.FreqDist(bigrams)
 
 def countTrigrams(words):
+	trigrams = nltk.trigrams(words)
+	return nltk.FreqDist(trigrams)
+
+def sortCountList(freqDist):
+	items = freqDist.items()
+	return sorted(items, key=itemgetter(1), reverse=True)
 
 if __name__ == "__main__":
     app.debug = True
