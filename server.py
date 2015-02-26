@@ -5,6 +5,7 @@ from nltk import FreqDist
 from nltk.corpus import stopwords
 from operator import itemgetter
 import tempfile 
+import codecs
 
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 from flask.ext.uploads import UploadSet, configure_uploads, TEXT
@@ -39,11 +40,11 @@ def index():
 			filepath = os.path.join(TEMP_DIR,filename)
 			logger.debug("Reading words from file (%s)" % filepath)
 			bag_of_words = ""
-			with open(filepath, "r") as myfile:
+			with codecs.open(filepath, "r", "utf-8") as myfile:
 				bag_of_words = myfile.read()
 		else:
 			logger.debug("Reading words from textarea")
-			bag_of_words = request.form['bagOfWords']
+			bag_of_words = unicode(request.form['bagOfWords'])
 
 		if "removeStopWords" in request.form:
 			remove_stop_words = request.form['removeStopWords']
@@ -68,6 +69,7 @@ def index():
 	return render_template("home.html", word_counts=word_counts, bigram_counts=bigram_counts, trigram_counts=trigram_counts)
 
 def createWords(text, remove_stop_words, ignore_case):
+	
 	words = nltk.tokenize.word_tokenize(text)
 	
 	if ignore_case:
