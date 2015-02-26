@@ -57,7 +57,7 @@ I would not like them anywhere.
 <div class="row">
 
   <div class="col-md-4" id="wordFreq">
-    <h3>Word Frequency</h3>
+    <h3>Top 40 Words</h3>
     <table class="table table-striped">
       <tr><th>Rank</th><th>Frequency</th><th>Word</th></tr>
       {% for word in word_counts %}
@@ -67,11 +67,21 @@ I would not like them anywhere.
   </div>
 
   <div class="col-md-4" id="biGrams">
-    <h3>2-Word Phrases (aka "bi-grams")</h3>
+    <h3>Top 40 Two-Word Phrases (aka "bigrams")</h3>
+    <table class="table table-striped">
+      <tr><th>Rank</th><th>Frequency</th><th>Phrase</th></tr>
+      {% for bigram in bigram_counts %}
+        <tr><td>?</td><td>{% bigram[1] %}</td><td>{% bigram[0] %}</td></tr>
+      {% endfor %}
+    </table>
   </div>
 
   <div class="col-md-4" id="triGrams">
-    <h3>3-Word Phrases (aka "tri-grams")</h3>
+    <h3>Top 40 Words Three-Word Phrases (aka "trigrams")</h3>
+      <tr><th>Rank</th><th>Frequency</th><th>Phrase</th></tr>
+      {% for trigram in trigram_counts %}
+        <tr><td>?</td><td>{% trigram[1] %}</td><td>{% trigram[0] %}</td></tr>
+      {% endfor %}
   </div>
 
 </div>
