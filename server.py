@@ -15,6 +15,10 @@ logger = logging.getLogger(__name__)
 
 @app.route("/",methods=['GET', 'POST'])
 def index():
+	word_counts = None
+	bigrams = None
+	trigrams = None
+
     #this means the form was submitted
 	if request.method == 'POST':	
 		bag_of_words = request.form['bagOfWords']
@@ -28,23 +32,28 @@ def index():
 		else:
 			ignore_case = False
 
-		countWords(bag_of_words, remove_stop_words, ignore_case)
+		words = createWords(bag_of_words, remove_stop_words, ignore_case)
+		fdist = countWords(words)
 		
 
-	return render_template("home.html")
+	return render_template("home.html", word_counts=fdist, bigrams=bigrams, trigrams=trigrams)
 
-def countWords(text, remove_stop_words, ignore_case):
+def createWords(text, remove_stop_words, ignore_case):
 	words = nltk.tokenize.word_tokenize(text)
 	
-	if not ignore_case:
-		words = w.lower() for w in words
+	if ignore_case:
+		words = [w.lower() for w in words]
 	if remove_stop_words:
 		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation]
 	else:
 		words = [w for w in words if not w in string.punctuation]
+	return words
 
+def countWords(words):
+	
 	fdist = FreqDist(words)
 	print fdist.most_common(100)
+	return fdist
 
 
 if __name__ == "__main__":
