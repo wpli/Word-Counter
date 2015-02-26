@@ -3,6 +3,7 @@ import nltk
 import string
 from nltk import FreqDist
 from nltk.corpus import stopwords
+from operator import itemgetter
 
 from flask import Flask, render_template, jsonify, request, redirect, url_for
 
@@ -33,10 +34,15 @@ def index():
 			ignore_case = False
 
 		words = createWords(bag_of_words, remove_stop_words, ignore_case)
-		fdist = countWords(words)
-		
+		word_counts = countWords(words).items()
+		word_counts = sorted(word_counts, key=itemgetter(1), reverse=True)
 
-	return render_template("home.html", word_counts=fdist, bigrams=bigrams, trigrams=trigrams)
+		bigram_counts = countBigrams(words)
+		trigram_counts = countTrigrams(words)
+
+		print word_counts
+
+	return render_template("home.html", word_counts=word_counts, bigram_counts=bigram_counts, trigram_counts=trigram_counts)
 
 def createWords(text, remove_stop_words, ignore_case):
 	words = nltk.tokenize.word_tokenize(text)
@@ -52,9 +58,13 @@ def createWords(text, remove_stop_words, ignore_case):
 def countWords(words):
 	
 	fdist = FreqDist(words)
-	print fdist.most_common(100)
+	#print fdist.most_common(100)
 	return fdist
 
+def countBigrams(words):
+	
+
+def countTrigrams(words):
 
 if __name__ == "__main__":
     app.debug = True
