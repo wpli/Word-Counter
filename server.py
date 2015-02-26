@@ -10,10 +10,8 @@ logger = logging.getLogger(__name__)
 
 @app.route("/")
 def index():
-    tag_sets = mediameter.tags.publicMediaTagSets()
-    return render_template("public-tags.html",
-        tag_sets = tag_sets
-    )
+    # do some stuff
+    return render_template("home.html")
 
 if __name__ == "__main__":
     app.debug = True
