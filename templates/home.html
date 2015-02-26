@@ -78,10 +78,12 @@ I would not like them anywhere.
 
   <div class="col-md-4" id="triGrams">
     <h3>Top 40 Words Three-Word Phrases (aka "trigrams")</h3>
+    <table class="table table-striped">
       <tr><th>Rank</th><th>Frequency</th><th>Phrase</th></tr>
       {% for trigram in trigram_counts %}
         <tr><td>?</td><td>{% trigram[1] %}</td><td>{% trigram[0] %}</td></tr>
       {% endfor %}
+    </table>
   </div>
 
 </div>
