@@ -1,11 +1,38 @@
 {% extends "base.html" %}
 
 {% block header %}
-<h1>HOME</h1>
+<h1>Word Counter</h1>
 {% endblock %}
 
 {% block content %}
-content
+<form action="/" method=POST>
+  <div class="form-group">
+    <label for="bagOfWords">Bag of Words</label>
+    <textarea class="form-control" rows="8" id="bagOfWords" name="bagOfWords">
+I am Sam
+Sam I am
+That Sam-I-am!
+That Sam-I-am!
+I do not like that Sam-I-am!
+Do you like 
+green eggs and ham?
+I do not like them, Sam-I-am.
+I do not like
+green eggs and ham.
+Would you like them 
+here or there?
+I would not like them
+here or there.
+I would not like them anywhere.
+    </textarea>
+  </div>
+  <div class="form-group">
+    <label for="fileOfWords">File input</label>
+    <input type="file" id="fileOfWords">
+    <p class="help-block">Or pick a file to upload</p>
+  </div>
+  <button type="submit" class="btn btn-default">Submit</button>
+</form>
 {% endblock %}
 
 {% block page_scripts %}
