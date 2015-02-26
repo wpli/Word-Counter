@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block content %}
-<form action="/" enctype=multipart/form-data method=POST>
+<form action="/" enctype="multipart/form-data" method="POST">
   <div class="form-group">
     <label for="bagOfWords">Bag of Words</label>
     <textarea class="form-control" rows="8" id="bagOfWords" name="bagOfWords">
@@ -28,7 +28,7 @@ I would not like them anywhere.
   </div>
   <div class="form-group">
     <label for="fileOfWords">File input</label>
-    <input type="file" id="fileOfWords">
+    <input type="file" id="fileOfWords" name="fileOfWords">
     <p class="help-block">Or pick a file to upload</p>
   </div>
   [ <a href="#" onclick="$('#advancedOptions').slideToggle();return false;"> advanced options</a> ]
