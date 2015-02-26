@@ -31,17 +31,22 @@ I would not like them anywhere.
     <input type="file" id="fileOfWords">
     <p class="help-block">Or pick a file to upload</p>
   </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" checked name="removeStopWords"> Remove stop words
-    </label>
+  [ <a href="#" onclick="$('#advancedOptions').slideToggle();return false;"> advanced options</a> ]
+  <div id="advancedOptions" style="display:none">
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" checked name="removeStopWords"> Remove stop words
+      </label>
+    </div>
+    <div class="checkbox">
+      <label>
+        <input type="checkbox" checked name="ignoreCase"> Ignore case
+      </label>
+    </div>
   </div>
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" checked name="ignoreCase"> Ignore case
-    </label>
+  <div>
+    <button type="submit" class="btn btn-default">Submit</button>
   </div>
-  <button type="submit" class="btn btn-default">Submit</button>
 </form>
 {% endblock %}
 
