@@ -16,14 +16,36 @@ logger = logging.getLogger(__name__)
 @app.route("/",methods=['GET', 'POST'])
 def index():
     #this means the form was submitted
-	if request.method == 'POST':
-		bagOfWords = request.form['bagOfWords']
-		words = nltk.tokenize.word_tokenize(bagOfWords)
-		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation]
-		fdist = FreqDist(words)
-		print fdist.most_common(100)
+	if request.method == 'POST':	
+		bag_of_words = request.form['bagOfWords']
+		if "removeStopWords" in request.form:
+			remove_stop_words = request.form['removeStopWords']
+		else:
+			remove_stop_words = False
+
+		if "ignoreCase" in request.form:
+			ignore_case = request.form['ignoreCase']
+		else:
+			ignore_case = False
+
+		countWords(bag_of_words, remove_stop_words, ignore_case)
+		
 
 	return render_template("home.html")
+
+def countWords(text, remove_stop_words, ignore_case):
+	words = nltk.tokenize.word_tokenize(text)
+	
+	if not ignore_case:
+		words = w.lower() for w in words
+	if remove_stop_words:
+		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation]
+	else:
+		words = [w for w in words if not w in string.punctuation]
+
+	fdist = FreqDist(words)
+	print fdist.most_common(100)
+
 
 if __name__ == "__main__":
     app.debug = True
