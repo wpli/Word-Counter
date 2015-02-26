@@ -75,9 +75,9 @@ def createWords(text, remove_stop_words, ignore_case):
 	if ignore_case:
 		words = [w.lower() for w in words]
 	if remove_stop_words:
-		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation]
+		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation and not w in "”"]
 	else:
-		words = [w for w in words if not w in string.punctuation]
+		words = [w for w in words if not w in string.punctuation and not w in "”"]
 	return words
 
 def countWords(words):
