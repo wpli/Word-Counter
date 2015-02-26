@@ -7,6 +7,7 @@ Dependencies
 ------------
 
 ```
-pip install flask
 pip install nltk
+pip install flask
+pip install flask-uploads
 ```
