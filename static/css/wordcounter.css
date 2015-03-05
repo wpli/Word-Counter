@@ -20,3 +20,9 @@
 #results{
     padding-top:20px;
 }
+.glyphicon {
+    position: absolute;
+    font-size: 30px;
+    padding-left: 21px;
+    padding-top: 3px;
+}
