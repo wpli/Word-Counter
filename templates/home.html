@@ -96,7 +96,10 @@
 <div class="row">
 
   <div class="col-sm-4" id="wordFreq">
-    <h3>Top Words</h3>
+    <h3>Top Words 
+         <a href="/download-csv/{{ csv_file_names['words'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+        
+    </h3>
     <table class="table table-striped">
       <tr><th>Frequency</th><th>Word</th></tr>
       {% for word in word_counts %}
@@ -106,7 +109,7 @@
   </div>
 
   <div class="col-sm-4" id="biGrams">
-    <h3>Top Two-Word Phrases</h3>
+    <h3>Top Two-Word Phrases <a href="/download-csv/{{ csv_file_names['bigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h3>
     <table class="table table-striped">
       <tr><th>Frequency</th><th>Phrase</th></tr>
       {% for bigram in bigram_counts %}
@@ -116,7 +119,7 @@
   </div>
 
   <div class="col-sm-4" id="triGrams">
-    <h3>Top Words Three-Word Phrases</h3>
+    <h3>Top Words Three-Word Phrases <a href="/download-csv/{{ csv_file_names['trigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h3>
     <table class="table table-striped">
       <tr><th>Frequency</th><th>Phrase</th></tr>
       {% for trigram in trigram_counts %}
