@@ -8,16 +8,17 @@ import tempfile
 import codecs
 
 from flask import Flask, render_template, jsonify, request, redirect, url_for
-from flask.ext.uploads import UploadSet, configure_uploads, TEXT
+from flask.ext.uploads import UploadSet, configure_uploads, TEXT, patch_request_class, UploadNotAllowed
 
 TEMP_DIR = tempfile.gettempdir()
 
 app = Flask(__name__)
-# TODO: set max upload size
+
 app.config['UPLOADED_DOCS_DEST'] = TEMP_DIR
 
 docs = UploadSet('docs', TEXT)
 configure_uploads(app, (docs,))
+patch_request_class(app, 4 * 1024 * 1024)	# 4MB
 
 # setup logging
 base_dir = os.path.dirname(os.path.abspath(__file__))
@@ -29,44 +30,50 @@ def index():
 	word_counts = None
 	bigram_counts = None
 	trigram_counts = None
+	error = None
 
-    #this means the form was submitted
-	if request.method == 'POST':	
+	try:
+	    #this means the form was submitted
+		if request.method == 'POST':	
 
-		file_to_upload = request.files['fileOfWords']
-		if file_to_upload:
-			#TODO: handle extension error (flaskext.uploads.UploadNotAllowed exception)
-			filename = docs.save(file_to_upload)
-			filepath = os.path.join(TEMP_DIR,filename)
-			logger.debug("Reading words from file (%s)" % filepath)
-			bag_of_words = ""
-			with codecs.open(filepath, "r", "utf-8") as myfile:
-				bag_of_words = myfile.read()
-		else:
-			logger.debug("Reading words from textarea")
-			bag_of_words = unicode(request.form['bagOfWords'])
+			file_to_upload = request.files['fileOfWords']
+			if file_to_upload:
+				#TODO: handle extension error (flaskext.uploads.UploadNotAllowed exception)
+				filename = docs.save(file_to_upload)
+				filepath = os.path.join(TEMP_DIR,filename)
+				logger.debug("Reading words from file (%s)" % filepath)
+				bag_of_words = ""
+				with codecs.open(filepath, "r", "utf-8") as myfile:
+					bag_of_words = myfile.read()
+			else:
+				logger.debug("Reading words from textarea")
+				bag_of_words = unicode(request.form['bagOfWords'])
 
-		if "removeStopWords" in request.form:
-			remove_stop_words = request.form['removeStopWords']
-		else:
-			remove_stop_words = False
+			if "removeStopWords" in request.form:
+				remove_stop_words = request.form['removeStopWords']
+			else:
+				remove_stop_words = False
 
-		if "ignoreCase" in request.form:
-			ignore_case = request.form['ignoreCase']
-		else:
-			ignore_case = False
+			if "ignoreCase" in request.form:
+				ignore_case = request.form['ignoreCase']
+			else:
+				ignore_case = False
 
-		words = createWords(bag_of_words, False, ignore_case)
+			words = createWords(bag_of_words, False, ignore_case)
 
-		words_perhaps_with_stop_words = createWords(bag_of_words, remove_stop_words, ignore_case)
+			words_perhaps_with_stop_words = createWords(bag_of_words, remove_stop_words, ignore_case)
 
-		word_counts = sortCountList(countWords(words_perhaps_with_stop_words))
+			word_counts = sortCountList(countWords(words_perhaps_with_stop_words))
 
-		bigram_counts = sortCountList(countBigrams(words))
+			bigram_counts = sortCountList(countBigrams(words))
 
-		trigram_counts = sortCountList(countTrigrams(words))
+			trigram_counts = sortCountList(countTrigrams(words))
+	except UploadNotAllowed:
+		error = "Sorry, we don't support that file extension.  Please upload a .txt (ie. plain text) file!"
 
-	return render_template("home.html", word_counts=word_counts, bigram_counts=bigram_counts, trigram_counts=trigram_counts)
+	return render_template("home.html", word_counts=word_counts, 
+		bigram_counts=bigram_counts, trigram_counts=trigram_counts,
+		error = error)
 
 def createWords(text, remove_stop_words, ignore_case):
 	
