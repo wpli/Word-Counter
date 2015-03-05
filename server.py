@@ -1,14 +1,14 @@
-import os, sys, time, json, logging, csv
+import os, sys, time, json, logging, csv, string, tempfile, codecs
+from operator import itemgetter
+
 import nltk
-import string
 from nltk import FreqDist
 from nltk.corpus import stopwords
-from operator import itemgetter
-import tempfile 
-import codecs
 
-from flask import Flask, render_template, jsonify, request, redirect, url_for
+from flask import Flask, Response, render_template, jsonify, request, redirect, url_for, abort
 from flask.ext.uploads import UploadSet, configure_uploads, TEXT, patch_request_class, UploadNotAllowed
+
+import unicodecsv
 
 TEMP_DIR = tempfile.gettempdir()
 
@@ -25,20 +25,24 @@ base_dir = os.path.dirname(os.path.abspath(__file__))
 logging.basicConfig(filename=os.path.join(base_dir,'wordcounter.log'),level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
+logger.info("Temp Dir is %s" % TEMP_DIR)
+
 @app.route("/",methods=['GET', 'POST'])
 def index():
 	word_counts = None
 	bigram_counts = None
 	trigram_counts = None
 	error = None
+	csv_file_names = None
 
 	try:
-	    #this means the form was submitted
+		#this means the form was submitted
 		if request.method == 'POST':	
 
+			# grab content
+			filename = time.strftime("%Y%m%d-%H%M%S") # this will get used for CSV download filenames if input text is submitted rather than a file to upload
 			file_to_upload = request.files['fileOfWords']
 			if file_to_upload:
-				#TODO: handle extension error (flaskext.uploads.UploadNotAllowed exception)
 				filename = docs.save(file_to_upload)
 				filepath = os.path.join(TEMP_DIR,filename)
 				logger.debug("Reading words from file (%s)" % filepath)
@@ -49,36 +53,67 @@ def index():
 				logger.debug("Reading words from textarea")
 				bag_of_words = unicode(request.form['bagOfWords'])
 
+			# parse the options the user set
 			if "removeStopWords" in request.form:
 				remove_stop_words = request.form['removeStopWords']
 			else:
 				remove_stop_words = False
-
 			if "ignoreCase" in request.form:
 				ignore_case = request.form['ignoreCase']
 			else:
 				ignore_case = False
 
-			words = createWords(bag_of_words, False, ignore_case)
-
+			# generate the results
+			words = createWords(bag_of_words, False, ignore_case)	# need all words for bigram, trigram
 			words_perhaps_with_stop_words = createWords(bag_of_words, remove_stop_words, ignore_case)
-
-			word_counts = sortCountList(countWords(words_perhaps_with_stop_words))
-
+			word_counts = sortCountList(countWords(words_perhaps_with_stop_words))	# ignore stop words here
 			bigram_counts = sortCountList(countBigrams(words))
-
 			trigram_counts = sortCountList(countTrigrams(words))
+
+			# cache the CSV results for easy download
+			csv_file_names = {
+				'words': filename+"-word-counts.csv",
+				'bigrams': filename+"-bigram-counts.csv",
+				'trigrams': filename+"-trigram-counts.csv"
+			}
+			write_csv_count_file(csv_file_names['words'], 'word', word_counts)
+			write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts)
+			write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts)
+			logger.debug("  Wrote CSV files to:")
+			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['words']))
+			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
+			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['trigrams']))
+
 	except UploadNotAllowed:
 		error = "Sorry, we don't support that file extension.  Please upload a .txt (ie. plain text) file!"
 
 	return render_template("home.html", word_counts=word_counts, 
 		bigram_counts=bigram_counts, trigram_counts=trigram_counts,
-		error = error)
+		error = error, csv_file_names = csv_file_names)
+
+@app.route('/download-csv/<csv_filename>')
+def download_csv(csv_filename):
+	file_path = os.path.join(TEMP_DIR,csv_filename)
+	if os.path.isfile(file_path):
+		def generate():
+			with open(file_path, 'r') as f:
+				reader = unicodecsv.reader(f, encoding='utf-8')
+				for row in reader:
+					yield ','.join(row) + '\n'
+		return Response(generate(), mimetype='text/csv')
+	else:
+		abort(400)
+
+def write_csv_count_file(file_name, text_col_header, freq_dist):
+	file_path = os.path.join(TEMP_DIR,file_name)
+	headers = ['frequency',text_col_header]
+	with open(file_path, 'w') as f:
+		writer = unicodecsv.writer(f, encoding='utf-8')
+		writer.writerow(headers)
+		[ writer.writerow([ word[1], word[0] ]) for word in freq_dist ]
 
 def createWords(text, remove_stop_words, ignore_case):
-	
 	words = nltk.tokenize.word_tokenize(text)
-	
 	#TODO - Remove curly quotes
 	if ignore_case:
 		words = [w.lower() for w in words]
@@ -89,7 +124,6 @@ def createWords(text, remove_stop_words, ignore_case):
 	return words
 
 def countWords(words):
-	
 	fdist = FreqDist(words)
 	return fdist
 
@@ -101,10 +135,10 @@ def countTrigrams(words):
 	trigrams = nltk.trigrams(words)
 	return nltk.FreqDist(trigrams)
 
-def sortCountList(freqDist):
-	items = freqDist.items()
+def sortCountList(freq_dist):
+	items = freq_dist.items()
 	return sorted(items, key=itemgetter(1), reverse=True)[:40]
 
 if __name__ == "__main__":
-    app.debug = True
-    app.run()
+	app.debug = True
+	app.run()

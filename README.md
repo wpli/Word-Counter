@@ -13,6 +13,7 @@ Make sure you havy Python 2.7 (and the pip package manager). Then install the de
 pip install nltk
 pip install flask
 pip install flask-uploads
+pip install unicodecsv
 ```
 
 Then install the NLTK libraries you need:
@@ -52,6 +53,7 @@ source venv/bin/activate
 pip install nltk
 pip install flask
 pip install flask-uploads
+pip install unicodecsv
 sudo pip install nltk
 sudo python -m nltk.downloader -d /usr/share/nltk_data punkt
 sudo python -m nltk.downloader -d /usr/share/nltk_data stopwords
