@@ -59,7 +59,9 @@ sudo python -m nltk.downloader -d /usr/share/nltk_data stopwords
 
 To configure Apache follow the instructions on how to run a Flask app via WSGI:
   http://flask.pocoo.org/docs/deploying/mod_wsgi/
+
 You'll do something like this in your apache config file `/etc/apache2/sites-available/word-counter.conf`:
+
 ```xml
 <VirtualHost *:80>
         ServerName my-word-counter.awesome
