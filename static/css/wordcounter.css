@@ -17,3 +17,6 @@
     cursor: inherit;
     display: block;
 }
+#results{
+    padding-top:20px;
+}
