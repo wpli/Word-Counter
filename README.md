@@ -45,16 +45,35 @@ sudo easy_install pip
 Then checkout the repo, set up a virtual environment, and get the NLTK libraries you need:
 ```
 cd /var/www/
-git clone https://github.com/c4fcm/Word-Counter
+sudo git clone https://github.com/c4fcm/Word-Counter
 cd Word-Counter
 virtualenv venv
 source venv/bin/activate
 pip install nltk
 pip install flask
 pip install flask-uploads
+sudo pip install nltk
 sudo python -m nltk.downloader -d /usr/share/nltk_data punkt
 sudo python -m nltk.downloader -d /usr/share/nltk_data stopwords
 ```
 
 To configure Apache follow the instructions on how to run a Flask app via WSGI:
   http://flask.pocoo.org/docs/deploying/mod_wsgi/
+You'll do something like this in your apache config file `/etc/apache2/sites-available/word-counter.conf`:
+```xml
+<VirtualHost *:80>
+        ServerName my-word-counter.awesome
+
+        WSGIDaemonProcess wordcounter user=www-data group=www-data threads=5 python-path=/var/www/Word-Counter/venv:/var/www/Word-Counter/venv/lib/python2.7/site-packages/
+        WSGIProcessGroup wordcounter
+        WSGIScriptAlias / /var/www/Word-Counter/server.wsgi
+        LogLevel info
+
+        <Directory /var/www/Word-Counter>
+                WSGIProcessGroup wordcounter
+                WSGIApplicationGroup %{GLOBAL}
+                Order deny,allow
+                Allow from all
+        </Directory>
+</VirtualHost>
+```
