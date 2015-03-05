@@ -22,7 +22,7 @@ patch_request_class(app, 4 * 1024 * 1024)	# 4MB
 
 # setup logging
 base_dir = os.path.dirname(os.path.abspath(__file__))
-logging.basicConfig(filename=os.path.join(base_dir,'wordcounter.log'),level=logging.DEBUG)
+logging.basicConfig(filename=os.path.join(base_dir,'wordcounter.log'),level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 logger.info("Temp Dir is %s" % TEMP_DIR)
