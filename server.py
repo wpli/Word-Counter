@@ -76,9 +76,9 @@ def index():
 				'bigrams': filename+"-bigram-counts.csv",
 				'trigrams': filename+"-trigram-counts.csv"
 			}
-			write_csv_count_file(csv_file_names['words'], 'word', word_counts)
-			write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts)
-			write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts)
+			write_csv_count_file(csv_file_names['words'], 'word', word_counts, False)
+			write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts, True)
+			write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts, True)
 			logger.debug("  Wrote CSV files to:")
 			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['words']))
 			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
@@ -104,13 +104,18 @@ def download_csv(csv_filename):
 	else:
 		abort(400)
 
-def write_csv_count_file(file_name, text_col_header, freq_dist):
+def write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 	file_path = os.path.join(TEMP_DIR,file_name)
 	headers = ['frequency',text_col_header]
 	with open(file_path, 'w') as f:
 		writer = unicodecsv.writer(f, encoding='utf-8')
 		writer.writerow(headers)
-		[ writer.writerow([ word[1], word[0] ]) for word in freq_dist ]
+		for word in freq_dist:
+			freq = word[1]
+			phrase = word[0]
+			if is_list:
+				phrase = " ".join(phrase)
+			writer.writerow([freq,phrase])
 
 def createWords(text, remove_stop_words, ignore_case):
 	words = nltk.tokenize.word_tokenize(text)
