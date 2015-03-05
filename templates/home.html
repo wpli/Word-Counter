@@ -19,27 +19,25 @@
                     
                       <div class="form-group">
                         
-                        <textarea class="form-control" rows="12" id="bagOfWords" name="bagOfWords">
-                    I am Sam
-                    Sam I am
-                    That Sam-I-am!
-                    That Sam-I-am!
-                    I do not like that Sam-I-am!
-                    Do you like 
-                    green eggs and ham?
-                    I do not like them, Sam-I-am.
-                    I do not like
-                    green eggs and ham.
-                    Would you like them 
-                    here or there?
-                    I would not like them
-                    here or there.
-                    I would not like them anywhere.
+                        <textarea class="form-control" rows="8" id="bagOfWords" name="bagOfWords">
+I am Sam
+Sam I am
+That Sam-I-am!
+That Sam-I-am!
+I do not like that Sam-I-am!
+Do you like 
+green eggs and ham?
+I do not like them, Sam-I-am.
+I do not like
+green eggs and ham.
+Would you like them 
+here or there?
+I would not like them
+here or there.
+I would not like them anywhere.
                         </textarea>
                       </div>
-                      
-                     
-                    
+
                 </div>
                 <div class="col-md-1 text-center">
                     <h3>OR</h3>
@@ -82,53 +80,57 @@
         </div>
     </section>
 
-
 {% if word_counts %}
+<!-- About Section -->
 <section id="results">
-<div class="container">
-    <div class="row">
-        <div class="col-lg-12 text-center">
-            <h2>Results</h2>
-            <hr class="star-primary">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12 text-center">
+                <h2>Results</h2>
+                <hr class="star-primary">
+            </div>
+        </div>
+        <div class="row">
+
+          <div class="col-sm-4" id="wordFreq">
+            <h4>Top Words 
+                 <a href="/download-csv/{{ csv_file_names['words'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+            </h4>
+            <table class="table table-striped">
+              <tr><th>Frequency</th><th>Word</th></tr>
+              {% for word in word_counts %}
+                <tr><td>{{ word[1] }}</td><td>{{ word[0] }}</td></tr>
+              {% endfor %}
+            </table>
+          </div>
+
+          <div class="col-sm-4" id="biGrams">
+            <h4>Top 2-Word Phrases 
+              <a href="/download-csv/{{ csv_file_names['bigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+            </h4>
+            <table class="table table-striped">
+              <tr><th>Frequency</th><th>Phrase</th></tr>
+              {% for bigram in bigram_counts %}
+                <tr><td>{{ bigram[1] }}</td><td>{{ " ".join(bigram[0]) }}</td></tr>
+              {% endfor %}
+            </table>
+          </div>
+
+          <div class="col-sm-4" id="triGrams">
+            <h4>Top 3-Word Phrases
+              <a href="/download-csv/{{ csv_file_names['trigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
+            </h4>
+            <table class="table table-striped">
+              <tr><th>Frequency</th><th>Phrase</th></tr>
+              {% for trigram in trigram_counts %}
+                <tr><td>{{ trigram[1] }}</td><td>{{ " ".join(trigram[0]) }}</td></tr>
+              {% endfor %}
+            </table>
+          </div>
         </div>
     </div>
-
-<div class="row">
-
-  <div class="col-sm-4" id="wordFreq">
-    <h4>Top Words 
-         <a href="/download-csv/{{ csv_file_names['words'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a>
-        
-    </h4>
-    <table class="table table-striped">
-      <tr><th>Frequency</th><th>Word</th></tr>
-      {% for word in word_counts %}
-        <tr><td>{{ word[1] }}</td><td>{{ word[0] }}</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-
-  <div class="col-sm-4" id="biGrams">
-    <h4>Top Two-Word Phrases <a href="/download-csv/{{ csv_file_names['bigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h4>
-    <table class="table table-striped">
-      <tr><th>Frequency</th><th>Phrase</th></tr>
-      {% for bigram in bigram_counts %}
-        <tr><td>{{ bigram[1] }}</td><td>{{ " ".join(bigram[0]) }}</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-
-  <div class="col-sm-4" id="triGrams">
-    <h4>Top Three-Word Phrases <a href="/download-csv/{{ csv_file_names['trigrams'] }}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a></h4>
-    <table class="table table-striped">
-      <tr><th>Frequency</th><th>Phrase</th></tr>
-      {% for trigram in trigram_counts %}
-        <tr><td>{{ trigram[1] }}</td><td>{{ " ".join(trigram[0]) }}</td></tr>
-      {% endfor %}
-    </table>
-  </div>
-</div>
 </section>
+<!-- Footer -->
 
 {% endif %}
 
