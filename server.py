@@ -64,11 +64,11 @@ def index():
 				ignore_case = False
 
 			# generate the results
-			words = createWords(bag_of_words, False, ignore_case)	# need all words for bigram, trigram
-			words_perhaps_with_stop_words = createWords(bag_of_words, remove_stop_words, ignore_case)
-			word_counts = sortCountList(countWords(words_perhaps_with_stop_words))	# ignore stop words here
-			bigram_counts = sortCountList(countBigrams(words))
-			trigram_counts = sortCountList(countTrigrams(words))
+			words = _create_words(bag_of_words, False, ignore_case)	# need all words for bigram, trigram
+			words_perhaps_with_stop_words = _create_words(bag_of_words, remove_stop_words, ignore_case)
+			word_counts = _sort_count_list(_count_words(words_perhaps_with_stop_words))	# ignore stop words here
+			bigram_counts = _sort_count_list(_count_bigrams(words))
+			trigram_counts = _sort_count_list(_count_trigrams(words))
 
 			# cache the CSV results for easy download
 			csv_file_names = {
@@ -76,9 +76,9 @@ def index():
 				'bigrams': filename+"-bigram-counts.csv",
 				'trigrams': filename+"-trigram-counts.csv"
 			}
-			write_csv_count_file(csv_file_names['words'], 'word', word_counts, False)
-			write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts, True)
-			write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts, True)
+			_write_csv_count_file(csv_file_names['words'], 'word', word_counts, False)
+			_write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts, True)
+			_write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts, True)
 			logger.debug("  Wrote CSV files to:")
 			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['words']))
 			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
@@ -104,7 +104,7 @@ def download_csv(csv_filename):
 	else:
 		abort(400)
 
-def write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
+def _write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 	file_path = os.path.join(TEMP_DIR,file_name)
 	headers = ['frequency',text_col_header]
 	with open(file_path, 'w') as f:
@@ -117,7 +117,7 @@ def write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 				phrase = " ".join(phrase)
 			writer.writerow([freq,phrase])
 
-def createWords(text, remove_stop_words, ignore_case):
+def _create_words(text, remove_stop_words, ignore_case):
 	words = nltk.tokenize.word_tokenize(text)
 	if ignore_case:
 		words = [w.lower() for w in words]
@@ -127,19 +127,19 @@ def createWords(text, remove_stop_words, ignore_case):
 		words = [w for w in words if not w in string.punctuation]
 	return words
 
-def countWords(words):
+def _count_words(words):
 	fdist = FreqDist(words)
 	return fdist
 
-def countBigrams(words):
+def _count_bigrams(words):
 	bigrams = nltk.bigrams(words)
 	return nltk.FreqDist(bigrams)
 
-def countTrigrams(words):
+def _count_trigrams(words):
 	trigrams = nltk.trigrams(words)
 	return nltk.FreqDist(trigrams)
 
-def sortCountList(freq_dist):
+def _sort_count_list(freq_dist):
 	items = freq_dist.items()
 	return sorted(items, key=itemgetter(1), reverse=True)[:40]
 
