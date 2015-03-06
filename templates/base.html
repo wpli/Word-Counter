@@ -67,14 +67,36 @@
   {{ content | safe }}
 {% endblock %}
 
-  <footer class="text-center" id="about">
+  <!-- About Section -->
+  <section class="success" id="about">
+      <div class="container">
+          <div class="row">
+              <div class="col-md-12 text-center">
+                  <h2>About</h2>
+                  <hr class="star-light">
+              </div>
+          </div>
+          <div class="row">
+	           <div class="col-md-6">
+								<h3>Scratching an Itch</h3>
+	            	<p>
+	            	This is a simple webpage that helps you count words, 2-word phrases (bigrams) and 3-word phrases (trigrams) in plain text. We created it to support some activities we do in our data visualization and storytelling classrooms. In our classes we introduce non-programmers to data analysis and storytelling. We want to help unlock the power of digital tools for everyone.
+	            	</p>
+	          </div>
+            <div class="col-md-6">
+								<h3>Empowering Everyone</h3>
+	            	<p>
+	            	There are a number of computer-assisted data analysis techniques like this that are readily available to programmers. Some of these are even just one line of code, but that one line is incomprehensible if you don't know how to program. We built this site to help bridge that gap, so non-programmers can take advantage of these capabilities.
+	            	</p>
+            </div>
+          </div>
+      </div>
+  </section>
+
+  <footer class="text-center" id="details">
     <div class="footer-above">
       <div class="container">
         <div class="row">
-          <div class="footer-col col-md-4">
-            <h3>What is this?</h3>
-            <p>This is a simple webpage that helps you count words, bigrams and trigrams in plain text. We created it to support some activities we do in our data visualization and storytelling classrooms.</p>
-          </div>
           <div class="footer-col col-md-4">
             <h3>Help!</h3>
             <p>Having problems? <br/>Tweet us: <a href="https://twitter.com/@rahulbot">@rahulbot</a> 
@@ -82,6 +104,12 @@
             </p>
             <p>
                You can also log bugs on our <a href="https://github.com/c4fcm/Word-Counter/issues">Github issues page</a>.
+            </p>
+          </div>
+					<div class="footer-col col-md-4">
+            <h3>Privacy</h3>
+            <p>
+            We take your privacy seriously.  We don't log or archive the text you upload.  We delete your uploaded file as soon as we have analyzed it.
             </p>
           </div>
           <div class="footer-col col-md-4">
