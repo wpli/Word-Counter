@@ -49,6 +49,7 @@ def index():
 				bag_of_words = ""
 				with codecs.open(filepath, "r", "utf-8") as myfile:
 					bag_of_words = myfile.read()
+				os.remove(filepath)		# privacy: don't keep the file around
 			else:
 				logger.debug("Reading words from textarea")
 				bag_of_words = unicode(request.form['bagOfWords'])
