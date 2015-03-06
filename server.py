@@ -22,7 +22,7 @@ patch_request_class(app, 4 * 1024 * 1024)	# 4MB
 
 # setup logging
 base_dir = os.path.dirname(os.path.abspath(__file__))
-logging.basicConfig(filename=os.path.join(base_dir,'wordcounter.log'),level=logging.INFO)
+logging.basicConfig(filename=os.path.join(base_dir,'wordcounter.log'),level=logging.WARN)
 logger = logging.getLogger(__name__)
 
 logger.info("Temp Dir is %s" % TEMP_DIR)
@@ -145,5 +145,4 @@ def _sort_count_list(freq_dist):
 	return sorted(items, key=itemgetter(1), reverse=True)[:40]
 
 if __name__ == "__main__":
-	app.debug = True
 	app.run()
