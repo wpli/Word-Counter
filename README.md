@@ -10,16 +10,13 @@ Installation
 Make sure you havy Python 2.7 (and the pip package manager). Then install the dependencies:
 
 ```
-pip install nltk
-pip install flask
-pip install flask-uploads
-pip install unicodecsv
+pip install -r requirements.pip
 ```
 
 Then install the NLTK libraries you need:
 ```
-sudo python -m nltk.downloader punkt
-sudo python -m nltk.downloader stopwords
+python -m nltk.downloader punkt
+python -m nltk.downloader stopwords
 ```
 
 Testing
