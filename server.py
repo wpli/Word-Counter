@@ -120,7 +120,7 @@ def _write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 
 def _create_words(text, remove_stop_words, ignore_case):
 	# words = nltk.tokenize.word_tokenize(text)
-	words = re.findall(r"[\w']+|[.,!?;]", text)
+	words = re.findall(r"[\w']+|[.,!?;]", text, re.UNICODE)
 	if ignore_case:
 		words = [w.lower() for w in words]
 	if remove_stop_words:
