@@ -11,6 +11,7 @@ from flask.ext.uploads import UploadSet, configure_uploads, TEXT, patch_request_
 import unicodecsv
 
 TEMP_DIR = tempfile.gettempdir()
+ROWS_TO_SHOW = 40	# how many rows to show on the webpage
 
 app = Flask(__name__)
 
@@ -84,11 +85,14 @@ def index():
 			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['words']))
 			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
 			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['trigrams']))
+			word_counts = word_counts[:ROWS_TO_SHOW]
+			bigram_counts = bigram_counts[:ROWS_TO_SHOW]
+			trigram_counts = trigram_counts[:ROWS_TO_SHOW]
 
 	except UploadNotAllowed:
 		error = "Sorry, we don't support that file extension.  Please upload a .txt (ie. plain text) file!"
 
-	return render_template("home.html", word_counts=word_counts, 
+	return render_template("home.html", word_counts=word_counts,
 		bigram_counts=bigram_counts, trigram_counts=trigram_counts,
 		error = error, csv_file_names = csv_file_names)
 
@@ -101,7 +105,7 @@ def download_csv(csv_filename):
 				reader = unicodecsv.reader(f, encoding='utf-8')
 				for row in reader:
 					yield ','.join(row) + '\n'
-		return Response(generate(), mimetype='text/csv')
+		return Response(generate(), headers={'Content-Disposition':'attachment;filename='+csv_filename},mimetype='text/csv')
 	else:
 		abort(400)
 
@@ -143,7 +147,7 @@ def _count_trigrams(words):
 
 def _sort_count_list(freq_dist):
 	items = freq_dist.items()
-	return sorted(items, key=itemgetter(1), reverse=True)[:40]
+	return sorted(items, key=itemgetter(1), reverse=True)
 
 if __name__ == "__main__":
 	app.run()
