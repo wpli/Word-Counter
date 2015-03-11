@@ -1,4 +1,4 @@
-import os, sys, time, json, logging, csv, string, tempfile, codecs
+import os, sys, time, json, logging, csv, string, tempfile, codecs, re
 from operator import itemgetter
 
 import nltk
@@ -81,9 +81,9 @@ def index():
 			_write_csv_count_file(csv_file_names['bigrams'], 'bigram phrase', bigram_counts, True)
 			_write_csv_count_file(csv_file_names['trigrams'], 'trigram phrase', trigram_counts, True)
 			logger.debug("  Wrote CSV files to:")
-			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['words']))
-			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
-			logger.debug("    %s",os.path.join(TEMP_DIR,csv_file_names['trigrams']))
+			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['words']))
+			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['bigrams']))
+			logger.debug("	%s",os.path.join(TEMP_DIR,csv_file_names['trigrams']))
 
 	except UploadNotAllowed:
 		error = "Sorry, we don't support that file extension.  Please upload a .txt (ie. plain text) file!"
@@ -119,7 +119,8 @@ def _write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 			writer.writerow([freq,phrase])
 
 def _create_words(text, remove_stop_words, ignore_case):
-	words = nltk.tokenize.word_tokenize(text)
+	# words = nltk.tokenize.word_tokenize(text)
+	words = re.findall(r"[\w']+|[.,!?;]", text)
 	if ignore_case:
 		words = [w.lower() for w in words]
 	if remove_stop_words:
