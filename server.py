@@ -69,15 +69,12 @@ def index():
 			# generate the results
 			t1 = time.time()
 			logger.debug("  init: %d" % (t1-t0))
-			words = _create_words(bag_of_words, False, ignore_case)	# need all words for bigram, trigram
+			words = _create_words(bag_of_words, ignore_case)	# keep all the words for now
 			t1a = time.time()
 			logger.debug("    words: %d" % (t1a-t1))
-			words_perhaps_with_stop_words = _create_words(bag_of_words, remove_stop_words, ignore_case)
-			t1b = time.time()
-			logger.debug("    words_perhaps_with_stop_words: %d" % (t1b-t1a))
-			word_counts = _sort_count_list(_count_words(words_perhaps_with_stop_words))	# ignore stop words here
+			word_counts = _sort_count_list(_count_words(words,remove_stop_words))	# ignore stop words here if you need to
 			t1c = time.time()
-			logger.debug("    word_counts: %d" % (t1c-t1b))
+			logger.debug("    word_counts: %d" % (t1c-t1a))
 			bigram_counts = _sort_count_list(_count_bigrams(words))
 			t1d = time.time()
 			logger.debug("    bigram_counts: %d" % (t1d-t1c))
@@ -139,7 +136,7 @@ def _write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 				phrase = " ".join(phrase)
 			writer.writerow([freq,phrase])
 
-def _create_words(text, remove_stop_words, ignore_case):
+def _create_words(text, ignore_case):
 	# words = nltk.tokenize.word_tokenize(text)
 	t1 = time.time()
 	words = re.findall(r"[\w']+|[.,!?;]", text, re.UNICODE)
@@ -147,18 +144,21 @@ def _create_words(text, remove_stop_words, ignore_case):
 	if ignore_case:
 		words = [w.lower() for w in words]
 	t3 = time.time()
-	if remove_stop_words:
-		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation ]
-	else:
-		words = [w for w in words if not w in string.punctuation]
+	words = [w for w in words if not w in string.punctuation]
 	t4 = time.time()
 	logger.debug("      tokenize: %d" % (t2-t1))
 	logger.debug("      ignore_case: %d" % (t3-t2))
-	logger.debug("      remove_stop_words: %d" % (t4-t3))
+	logger.debug("      remove punctuation: %d" % (t4-t3))
 	return words
 
-def _count_words(words):
+def _count_words(words, ignore_stop_words):
 	fdist = FreqDist(words)
+	# remove stopwords here rather than in corpus text for speed
+	if ignore_stop_words:
+		# http://stackoverflow.com/questions/7154312/how-do-i-remove-entries-within-a-counter-object-with-a-loop-without-invoking-a-r
+		for w in list(fdist):
+			if w in stopwords.words('english'):
+				del fdist[w]
 	return fdist
 
 def _count_bigrams(words):
