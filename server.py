@@ -30,6 +30,7 @@ logger.info("Temp Dir is %s" % TEMP_DIR)
 
 @app.route("/",methods=['GET', 'POST'])
 def index():
+	t0 = time.time()
 	word_counts = None
 	bigram_counts = None
 	trigram_counts = None
@@ -66,11 +67,24 @@ def index():
 				ignore_case = False
 
 			# generate the results
+			t1 = time.time()
+			logger.debug("  init: %d" % (t1-t0))
 			words = _create_words(bag_of_words, False, ignore_case)	# need all words for bigram, trigram
+			t1a = time.time()
+			logger.debug("    words: %d" % (t1a-t1))
 			words_perhaps_with_stop_words = _create_words(bag_of_words, remove_stop_words, ignore_case)
+			t1b = time.time()
+			logger.debug("    words_perhaps_with_stop_words: %d" % (t1b-t1a))
 			word_counts = _sort_count_list(_count_words(words_perhaps_with_stop_words))	# ignore stop words here
+			t1c = time.time()
+			logger.debug("    word_counts: %d" % (t1c-t1b))
 			bigram_counts = _sort_count_list(_count_bigrams(words))
+			t1d = time.time()
+			logger.debug("    bigram_counts: %d" % (t1d-t1c))
 			trigram_counts = _sort_count_list(_count_trigrams(words))
+			t2 = time.time()
+			logger.debug("    trigram_counts: %d" % (t2-t1d))
+			logger.debug("  counts: %d" % (t2-t1))
 
 			# cache the CSV results for easy download
 			csv_file_names = {
@@ -88,6 +102,9 @@ def index():
 			word_counts = word_counts[:ROWS_TO_SHOW]
 			bigram_counts = bigram_counts[:ROWS_TO_SHOW]
 			trigram_counts = trigram_counts[:ROWS_TO_SHOW]
+			t3 = time.time()
+			logger.debug("  csvs: %d" % (t3-t2))
+			logger.debug("Timings (total %d)" % (t3-t0))
 
 	except UploadNotAllowed:
 		error = "Sorry, we don't support that file extension.  Please upload a .txt (ie. plain text) file!"
@@ -124,13 +141,20 @@ def _write_csv_count_file(file_name, text_col_header, freq_dist, is_list):
 
 def _create_words(text, remove_stop_words, ignore_case):
 	# words = nltk.tokenize.word_tokenize(text)
+	t1 = time.time()
 	words = re.findall(r"[\w']+|[.,!?;]", text, re.UNICODE)
+	t2 = time.time()
 	if ignore_case:
 		words = [w.lower() for w in words]
+	t3 = time.time()
 	if remove_stop_words:
 		words = [w for w in words if not w in stopwords.words('english') and not w in string.punctuation ]
 	else:
 		words = [w for w in words if not w in string.punctuation]
+	t4 = time.time()
+	logger.debug("      tokenize: %d" % (t2-t1))
+	logger.debug("      ignore_case: %d" % (t3-t2))
+	logger.debug("      remove_stop_words: %d" % (t4-t3))
 	return words
 
 def _count_words(words):
